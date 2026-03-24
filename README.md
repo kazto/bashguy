@@ -1,6 +1,6 @@
 # bashguy
 
-A shell widget that generates bash commands from natural language using Claude.
+A shell widget that generates commands from natural language using Claude.
 
 https://github.com/user-attachments/assets/f7d73d76-d7c5-437c-9ac9-8633795f8e3a
 
@@ -9,11 +9,11 @@ Type what you want to do in plain English, and Claude generates the command and 
 ## Requirements
 
 - [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) (`claude` command)
-- Bash
+- Bash or Zsh
 
 ## Installation
 
-Add the following to your `.bashrc`:
+Add the following to your `.bashrc` or `.zshrc`:
 
 ```bash
 source /path/to/bashguy.sh
@@ -21,20 +21,33 @@ source /path/to/bashguy.sh
 
 ## Key Binding
 
-No key binding is set by default. Add a `bind` command after sourcing the script in your `.bashrc`:
+No key binding is set by default. Add a key binding after sourcing the script.
+
+### Bash (`.bashrc`)
 
 ```bash
 source /path/to/bashguy.sh
 bind -x '"\C-g": _bashguy_widget'
 ```
 
-### Examples
-
 | Key | bind command |
 |-----|-------------|
 | Ctrl+G | `bind -x '"\C-g": _bashguy_widget'` |
 | Ctrl+J | `bind -x '"\C-j": _bashguy_widget'` |
 | Ctrl+X Ctrl+G | `bind -x '"\C-x\C-g": _bashguy_widget'` |
+
+### Zsh (`.zshrc`)
+
+```zsh
+source /path/to/bashguy.sh
+bindkey '^G' _bashguy_widget
+```
+
+| Key | bindkey command |
+|-----|----------------|
+| Ctrl+G | `bindkey '^G' _bashguy_widget` |
+| Ctrl+J | `bindkey '^J' _bashguy_widget` |
+| Ctrl+X Ctrl+G | `bindkey '^X^G' _bashguy_widget` |
 
 ## Usage
 

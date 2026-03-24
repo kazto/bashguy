@@ -1,10 +1,10 @@
-# bashguy.sh - source this file in your .bashrc
+# bashguy.sh - source this file in your .bashrc or .zshrc
 # Usage: source /path/to/bashguy.sh
 # Then press Ctrl+G to enter prompt mode
 
-_bashguy_widget() {
-  local prefix="${READLINE_LINE:0:$READLINE_POINT}"
-  local suffix="${READLINE_LINE:$READLINE_POINT}"
+_bashguy_run() {
+  local prefix="$1"
+  local suffix="$2"
   local cmd
   cmd=$(
     saved_tty=$(stty -g </dev/tty)
@@ -15,8 +15,8 @@ _bashguy_widget() {
     if [ -n "$prompt" ]; then
       echo -ne "\e[A\r\e[K[bashguy] ${prompt} generating..." >/dev/tty
       if [ -n "$prefix" ] || [ -n "$suffix" ]; then
-        system="You are a bash command generator. The user has a partially written command line. The text before the cursor is: $(printf '%s' "$prefix" | sed 's/"/\\"/g')
-The text after the cursor is: $(printf '%s' "$suffix" | sed 's/"/\\"/g')
+        system="You are a bash command generator. The user has a partially written command line. The text before the cursor is: $(printf '%s' "$prefix" | sed 's/\"/\\\\\"/g')
+The text after the cursor is: $(printf '%s' "$suffix" | sed 's/\"/\\\\\"/g')
 Output ONLY the text to insert at the cursor position (no explanation, no markdown, no code fences, no trailing newline). The inserted text combined with the existing text should form a valid bash command. Current directory: $(pwd)"
       else
         system="You are a bash command generator. The user describes what they want to do in natural language. Output ONLY a single bash command (no explanation, no markdown, no code fences, no trailing newline). The command should work on Linux. Current directory: $(pwd)"
@@ -27,8 +27,31 @@ Output ONLY the text to insert at the cursor position (no explanation, no markdo
     fi
     stty "$saved_tty" </dev/tty
   )
-  if [ -n "$cmd" ]; then
-    READLINE_LINE="${prefix}${cmd}${suffix}"
-    READLINE_POINT=$(( ${#prefix} + ${#cmd} ))
-  fi
+  printf '%s' "$cmd"
 }
+
+if [ -n "$ZSH_VERSION" ]; then
+  _bashguy_widget() {
+    local prefix="$LBUFFER"
+    local suffix="$RBUFFER"
+    local cmd
+    cmd=$(_bashguy_run "$prefix" "$suffix")
+    if [ -n "$cmd" ]; then
+      LBUFFER="${prefix}${cmd}"
+      RBUFFER="${suffix}"
+    fi
+    zle reset-prompt
+  }
+  zle -N _bashguy_widget
+else
+  _bashguy_widget() {
+    local prefix="${READLINE_LINE:0:$READLINE_POINT}"
+    local suffix="${READLINE_LINE:$READLINE_POINT}"
+    local cmd
+    cmd=$(_bashguy_run "$prefix" "$suffix")
+    if [ -n "$cmd" ]; then
+      READLINE_LINE="${prefix}${cmd}${suffix}"
+      READLINE_POINT=$(( ${#prefix} + ${#cmd} ))
+    fi
+  }
+fi
