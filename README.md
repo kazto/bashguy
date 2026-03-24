@@ -2,6 +2,8 @@
 
 A shell widget that generates bash commands from natural language using Claude.
 
+https://github.com/user-attachments/assets/f7d73d76-d7c5-437c-9ac9-8633795f8e3a
+
 Type what you want to do in plain English, and Claude generates the command and inserts it into your command line. If there's already partial input, it inserts a completion at the cursor position.
 
 ## Requirements
